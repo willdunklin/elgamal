@@ -22,14 +22,14 @@ class ElGamal:
     def private_key(self):
         return self.a
 
-    def get_generator(self):
+    def get_generator(self) -> int:
         q = (self.p - 1) // 2
         n = random.randint(2, self.p - 1)
         while (n*n) % self.p == 1 or expmod(n, q, self.p) == 1:
             n = random.randint(2, self.p - 1)
         return n
 
-    def encrypt(self, x: int):
+    def encrypt(self, x: int) -> tuple[int, int]:
         alpha = random.randint(0, self.p - 1)
         beta = expmod(self.g, alpha, self.p)
         f = expmod(self.b, alpha, self.p)
@@ -37,7 +37,7 @@ class ElGamal:
 
         return x, beta
 
-    def decrypt(self, x: int, beta: int):
+    def decrypt(self, x: int, beta: int) -> int:
         f = expmod(beta, self.a, self.p)
         _, f_inv, _ = extended_euclid(f, self.p)
 
