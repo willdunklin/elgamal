@@ -1,27 +1,27 @@
 from elgamal import ElGamal
+import argparse
 
 if __name__ == '__main__':
-    import argparse
     parser = argparse.ArgumentParser()
     parser.set_defaults(cmd=None)
     subparsers = parser.add_subparsers(dest='subparser_name')
 
-    gen_keys_parser = subparsers.add_parser('gen_keys')
-    gen_keys_parser.add_argument('n_bits', type=int)
-    gen_keys_parser.add_argument('certainty', type=int)
-    gen_keys_parser.add_argument('pubkeys_file', type=str)
-    gen_keys_parser.add_argument('privkey_file', type=str)
+    gen_keys_parser = subparsers.add_parser('gen_keys', help='Generate ElGamal public/private keys')
+    gen_keys_parser.add_argument('n_bits', type=int, help='Number of bits in P')
+    gen_keys_parser.add_argument('certainty', type=int, help='Certainty of the Miller-Rabin algorithm (100 is reasonable)')
+    gen_keys_parser.add_argument('pubkeys_file', type=str, help='File to write public keys to')
+    gen_keys_parser.add_argument('privkey_file', type=str, help='File to write private key to')
 
-    encrypt_parser = subparsers.add_parser('encrypt')
-    encrypt_parser.add_argument('pubkeys_file', type=str)
-    encrypt_parser.add_argument('plaintext_file', type=str)
-    encrypt_parser.add_argument('encrypted_file', type=str)
+    encrypt_parser = subparsers.add_parser('encrypt', help='Encrypt a file using ElGamal')
+    encrypt_parser.add_argument('pubkeys_file', type=str, help='File containing public keys')
+    encrypt_parser.add_argument('plaintext_file', type=str, help='File containing plaintext to encrypt')
+    encrypt_parser.add_argument('encrypted_file', type=str, help='File to write encrypted text to')
 
-    decrypt_parser = subparsers.add_parser('decrypt')
-    decrypt_parser.add_argument('pubkeys_file', type=str)
-    decrypt_parser.add_argument('privkey_file', type=str)
-    decrypt_parser.add_argument('encrypted_file', type=str)
-    decrypt_parser.add_argument('decrypted_file', type=str)
+    decrypt_parser = subparsers.add_parser('decrypt', help='Decrypt a file using ElGamal')
+    decrypt_parser.add_argument('pubkeys_file', type=str, help='File containing public keys')
+    decrypt_parser.add_argument('privkey_file', type=str, help='File containing private key')
+    decrypt_parser.add_argument('encrypted_file', type=str, help='File containing encrypted text')
+    decrypt_parser.add_argument('decrypted_file', type=str, help='File to write decrypted text to')
 
     args = parser.parse_args()
 
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         e = ElGamal(args.n_bits, num_checks=args.certainty)
 
         with open(args.pubkeys_file, 'w') as f:
-            f.write(' '.join(map(str, e.pub_keys)))
+            f.write('\n'.join(map(str, e.pub_keys)))
         with open(args.privkey_file, 'w') as f:
             f.write(str(e.private_key))
 
@@ -41,6 +41,7 @@ if __name__ == '__main__':
 
         e = ElGamal(public_keys=pub_keys)
         encrypted = e.encrypt_text(text)
+
         with open(args.encrypted_file, 'w') as f:
             f.write('\n'.join(map(lambda e: f"{e[0]} {e[1]}", encrypted)))
 
@@ -59,3 +60,6 @@ if __name__ == '__main__':
 
         with open(args.decrypted_file, 'w') as f:
             f.write(decrypted)
+
+    else:
+        parser.print_help()
