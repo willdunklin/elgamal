@@ -59,6 +59,3 @@ if __name__ == '__main__':
 
         with open(args.decrypted_file, 'w') as f:
             f.write(decrypted)
-
-    else:
-        parser.print_help()
