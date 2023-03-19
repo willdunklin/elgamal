@@ -40,7 +40,7 @@ Features
 
 File Structure
 --------------
-.. code-block:: console
+.. code-block:: python
   - pf_sim_2/
       - app/
           - engine/ # Trame logic
