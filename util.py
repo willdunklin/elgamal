@@ -60,3 +60,11 @@ def extended_euclid(a: int, b: int) -> tuple[int, int, int]:
     #       = old_s * a + old_t * b
     # GCD, Bezout coeff 1, Bezout coeff 2
     return old_r, old_s, old_t
+
+# Multiplicative inverse of x (mod prime)
+def mul_inv(x: int, prime: int) -> int:
+    if x == 0:
+        raise ValueError(f'Cannot get the multiplicative inverse of 0 (mod {prime})')
+
+    _, x_inv, _ = extended_euclid(x, prime)
+    return x_inv % prime
