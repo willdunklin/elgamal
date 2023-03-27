@@ -16,6 +16,15 @@ class ECurve:
     def disc(self):
         return (4*self.a**3 + 27*self.b**2) % self.p
 
+    def valid(self, x, y):
+        a, b, p = self.a, self.b, self.p
+        return (y*y % p) == ((x*x*x + a*x + b) % p)
+
+    def __call__(self, x):
+        a, b, p = self.a, self.b, self.p
+        y2 = (x*x*x + a*x + b) % p
+        return y2
+
 # Elliptic Curve Point
 class ECPoint:
     def __init__(self, x: int, y: int, curve: ECurve, inf: bool = False):
@@ -39,22 +48,18 @@ class ECPoint:
 
     def valid(self) -> bool:
         if self.inf: return True # Always include the point at infinity
-
-        x, y, a, b, p = self.x, self.y, self.a, self.b, self.p
-        return (y*y % p) == ((x*x*x + a*x + b) % p)
-
+        return self.curve.valid(self.x, self.y)
 
     def __add__(self, other):
-        if not self.valid():
-            raise ValueError(f'self: {self}, is not on curve {self}')
-        if not other.valid():
-            raise ValueError(f'other: {other}, is not on curve {self}')
-
         if self.inf:
             return other
         if other.inf:
             return self
 
+        # if not self.valid():
+        #     raise ValueError(f'self: {self}, is not on curve {self.curve}')
+        # if not other.valid():
+        #     raise ValueError(f'other: {other}, is not on curve {self.curve}')
 
         if self.x == other.x and self.y == -other.y % self.p:
             return self.point_at_infinity()
