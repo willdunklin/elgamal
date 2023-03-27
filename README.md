@@ -4,7 +4,7 @@ Basic implementation of naive ElGamal cryptosystem.
 
 ## Usage
 
-```
+```shell
 # Help
 $ python3.9 main.py -h
 
