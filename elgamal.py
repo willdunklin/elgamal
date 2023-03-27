@@ -1,8 +1,9 @@
-from util import gen_safe_prime, expmod, extended_euclid
+from encryption import Encryption
+from util import gen_safe_prime, expmod, mul_inv
 import random
 import math
 
-class ElGamal:
+class ElGamal(Encryption):
     def __init__(self, k: int = 1000, public_keys: tuple[int] = None, priv_key: int = None, num_checks: int = 100):
         if not public_keys:
             self.p = gen_safe_prime(k, num_checks=num_checks)
@@ -39,30 +40,8 @@ class ElGamal:
 
     def decrypt(self, x: int, beta: int) -> int:
         f = expmod(beta, self.a, self.p)
-        _, f_inv, _ = extended_euclid(f, self.p)
-
-        x = (x * f_inv) % self.p
-        return x
-
-    def encrypt_text(self, text: str) -> list[tuple[int, int]]:
-        bytes = text.encode('utf-8') # byte string representing text
-        bytes_per_n = max(self.k // 8, 1)
-
-        # split text into chunks of k bits and convert them to integers
-        ints = []
-        for i in range(math.ceil(len(bytes) / bytes_per_n)):
-            byte_substr = bytes[i*bytes_per_n : (i+1)*bytes_per_n]
-            ints.append(int(byte_substr.hex(), base=16))
-
-        # encrypt the integer representation of text
-        return [self.encrypt(i) for i in ints]
+        return (x * mul_inv(f, self.p)) % self.p
 
     def decrypt_text(self, cypher: list[tuple[int, int]]) -> str:
-        text = ''
-
-        for (x, beta) in cypher:
-            m = self.decrypt(x, beta)
-            num_bytes = 1 if m == 1 else math.ceil(math.log(x)/math.log(256))
-            text += m.to_bytes(num_bytes, 'big').decode('utf-8')
-
-        return text
+        cypher = [(c[1], c[0]) for c in cypher] # have to reverse the order of tuples for it to work
+        return super().decrypt_text(cypher)
