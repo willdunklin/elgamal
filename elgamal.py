@@ -1,5 +1,5 @@
-from encryption import Encryption
-from util import gen_safe_prime, expmod, mul_inv
+from util.encryption import Encryption
+from util.util import gen_safe_prime, expmod, mul_inv
 import random
 import math
 

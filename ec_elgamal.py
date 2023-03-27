@@ -1,6 +1,6 @@
-from encryption import Encryption
-from util import gen_prime
-from ec_util import ECurve, ECPoint, str_to_point
+from util.encryption import Encryption
+from util.util import gen_prime
+from util.elliptic_curves import ECurve, ECPoint, str_to_point
 import random
 import math
 

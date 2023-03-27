@@ -1,4 +1,4 @@
-from util import mul_inv
+from .util import mul_inv
 
 
 # Elliptic Curve
@@ -97,6 +97,7 @@ class ECPoint:
     def __sub__(self, other):
         return self + (-other)
 
+
 def str_to_point(s: str, curve: ECurve, comma: bool = False) -> ECPoint:
     if s == 'inf':
         return ECPoint(0, 0, curve, inf=True)
@@ -106,6 +107,7 @@ def str_to_point(s: str, curve: ECurve, comma: bool = False) -> ECPoint:
         raise ValueError(f'Could not parse point {s}, there are not 2 "{"," if comma else " "}" separated values')
 
     return ECPoint(int(parts[0]), int(parts[1]), curve)
+
 
 if __name__ == '__main__':
     e = ECurve(4, 34, 43)
