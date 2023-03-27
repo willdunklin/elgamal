@@ -1,9 +1,24 @@
 from elgamal import ElGamal
+from ec_elgamal import ElGamalEC
 import argparse
+
+def read_pub_keys(file):
+    with open(file, 'r') as f:
+        vals = f.read().split()
+    pub_keys = []
+    # Read all ints, except for strings that aren't ints
+    for v in vals:
+        try:
+            pub_keys.append(int(v))
+        except ValueError:
+            pub_keys.append(v)
+    return tuple(pub_keys)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.set_defaults(cmd=None)
+    parser.add_argument('enc_type', type=str, help='Type of encryption to use: (elgamal, ec_elgamal)')
+
     subparsers = parser.add_subparsers(dest='subparser_name')
 
     gen_keys_parser = subparsers.add_parser('gen_keys', help='Generate ElGamal public/private keys')
@@ -25,8 +40,13 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.enc_type == 'elgamal':
+        Enc = ElGamal
+    elif args.enc_type == 'ec_elgamal':
+        Enc = ElGamalEC
+
     if args.subparser_name == 'gen_keys':
-        e = ElGamal(args.n_bits, num_checks=args.certainty)
+        e = Enc(k=args.n_bits, num_checks=args.certainty)
 
         with open(args.pubkeys_file, 'w') as f:
             f.write('\n'.join(map(str, e.pub_keys)))
@@ -34,20 +54,18 @@ if __name__ == '__main__':
             f.write(str(e.private_key))
 
     elif args.subparser_name == 'encrypt':
-        with open(args.pubkeys_file, 'r') as f:
-            pub_keys = tuple(map(int, f.read().split()))
+        pub_keys = read_pub_keys(args.pubkeys_file)
         with open(args.plaintext_file, 'r') as f:
             text = f.read()
 
-        e = ElGamal(public_keys=pub_keys)
+        e = Enc(public_keys=pub_keys)
         encrypted = e.encrypt_text(text)
 
         with open(args.encrypted_file, 'w') as f:
             f.write('\n'.join(map(lambda e: f"{e[0]} {e[1]}", encrypted)))
 
     elif args.subparser_name == 'decrypt':
-        with open(args.pubkeys_file, 'r') as f:
-            pub_keys = tuple(map(int, f.read().split()))
+        pub_keys = read_pub_keys(args.pubkeys_file)
         with open(args.privkey_file, 'r') as f:
             priv_key = int(f.read())
 
@@ -55,7 +73,7 @@ if __name__ == '__main__':
             encrypted = f.readlines()
         encrypted = [tuple(map(int, line.split())) for line in encrypted]
 
-        e = ElGamal(public_keys=pub_keys, a=priv_key)
+        e = Enc(public_keys=pub_keys, priv_key=priv_key)
         decrypted = e.decrypt_text(encrypted)
 
         with open(args.decrypted_file, 'w') as f:

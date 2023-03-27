@@ -1,23 +1,27 @@
 from encryption import Encryption
 from util import gen_prime
-from ec_util import ECurve, ECPoint
+from ec_util import ECurve, ECPoint, str_to_point
 import random
 import math
 
 class ElGamalEC(Encryption):
-    def __init__(self, k: int = 1000, public_keys: tuple = None, n: int = None, num_checks: int = 100):
+    def __init__(self, k: int = 1000, public_keys: tuple = None, priv_key: int = None, num_checks: int = 100):
         if not public_keys:
             self.q = gen_prime(k, num_checks=num_checks)
             self.a, self.b = self.get_ab()
             self.curve = ECurve(self.a, self.b, self.q)
             self.g = self.get_generator()
 
-            self.n = random.randint(1, 10)
+            self.n = random.randint(1, 10) # TODO: this is awful, this needs to be redone
             self.p = self.n * self.g
         else:
             self.q, self.a, self.b, self.g, self.p = public_keys
+
             self.curve = ECurve(self.a, self.b, self.q)
-            self.n = n if n else random.randint(1, 10)
+            self.g = str_to_point(self.g, self.curve, comma=True)
+            self.p = str_to_point(self.p, self.curve, comma=True)
+
+            self.n = priv_key if priv_key else random.randint(1, 10)
 
         self.k = math.floor(math.log2(self.q))
 
@@ -60,7 +64,14 @@ class ElGamalEC(Encryption):
         point = y - (self.n * alpha)
         return point.x
 
+    def decrypt_text(self, cypher: list) -> str:
+        # Parse the cypher list before actual processing
+        cypher = [(ECPoint(c[0], c[1], self.curve), ECPoint(c[2], c[3], self.curve)) for c in cypher]
+        return super().decrypt_text(cypher)
+
+
 if __name__ == '__main__':
+    # Assignment 3 test (first char)
     q = 111697039144439244274158398653562346085125490793664062732425069223685968110844126905903321206114392849452542256992315754843167574112467024858088205347572299296687223643952822745811271693456632679803618511515217807199664219990752590959138703164100104061985978987701427311881250925416668035932094333108552446839
     a = 150670258656281464005027759708221023233910114637886003539106738481215882957713483236742237072518545883429463829128035822122070539009268529588117340272238455156286895193960706935802180341819752120102766312902122204702353872155278694417075931419847141024333493817900461006527055261695842425790546228916431325513
     b = 104815861020657080241596578752393940140617569980803135496881290764938288013364134928068097698824115341484980977151298278192209798477977140363086488236483224661104202521225088803004668319349969513561776896401494842782206897897856458042025648888304723359320219472250799841670786377536581380629352855788742594142
@@ -82,4 +93,7 @@ if __name__ == '__main__':
     parts = [int(p) for p in line.split(' ')]
     c = ECPoint(parts[0], parts[1], curve)
     h = ECPoint(parts[2], parts[3], curve)
-    print(el.decrypt(c, h))
+
+    char = el.decrypt(c, h)
+    print(char, chr(char))
+    assert char == 97

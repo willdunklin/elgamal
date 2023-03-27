@@ -3,7 +3,7 @@ import random
 import math
 
 class ElGamal:
-    def __init__(self, k: int = 1000, public_keys: tuple[int] = None, a: int = None, num_checks: int = 100):
+    def __init__(self, k: int = 1000, public_keys: tuple[int] = None, priv_key: int = None, num_checks: int = 100):
         if not public_keys:
             self.p = gen_safe_prime(k, num_checks=num_checks)
             self.g = self.get_generator()
@@ -11,7 +11,7 @@ class ElGamal:
             self.b = expmod(self.g, self.a, self.p)
         else:
             self.p, self.g, self.b = public_keys
-            self.a = a if a else random.randint(0, self.p - 1)
+            self.a = priv_key if priv_key else random.randint(0, self.p - 1)
         self.k = math.floor(math.log2(self.p))
 
     @property

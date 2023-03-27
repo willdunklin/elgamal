@@ -1,7 +1,7 @@
 import math
 
 class Encryption:
-    def encrypt(self, *args) -> tuple[int, int]:
+    def encrypt(self, *args) -> tuple:
         raise NotImplementedError('Must implement encryption')
 
     def decrypt(self, *args) -> int:
@@ -25,7 +25,7 @@ class Encryption:
 
         for (x, *rest) in cypher:
             m = self.decrypt(x, *rest)
-            num_bytes = 1 if m == 1 else math.ceil(math.log(x)/math.log(256))
+            num_bytes = 1 if m == 1 else math.ceil(math.log(m)/math.log(256))
             text += m.to_bytes(num_bytes, 'big').decode('utf-8')
 
         return text
