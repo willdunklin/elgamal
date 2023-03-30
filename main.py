@@ -1,5 +1,5 @@
-from elgamal import ElGamal
 from ec_elgamal import ElGamalEC
+from elgamal import ElGamal
 import argparse
 
 def read_pub_keys(file):
