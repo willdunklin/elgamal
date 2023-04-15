@@ -1,5 +1,9 @@
-from util.encryption import Encryption
-from util.util import gen_safe_prime, expmod, mul_inv
+try:
+    from util.encryption import Encryption
+    from util.util import gen_safe_prime, expmod, mul_inv
+except ImportError:
+    from .util.encryption import Encryption
+    from .util.util import gen_safe_prime, expmod, mul_inv
 import random
 import math
 
