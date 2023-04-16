@@ -45,7 +45,3 @@ class ElGamal(Encryption):
     def decrypt(self, x: int, beta: int) -> int:
         f = expmod(beta, self.a, self.p)
         return (x * mul_inv(f, self.p)) % self.p
-
-    def decrypt_text(self, cypher: list[tuple[int, int]]) -> str:
-        cypher = [(c[1], c[0]) for c in cypher] # have to reverse the order of tuples for it to work
-        return super().decrypt_text(cypher)
